@@ -7,257 +7,263 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-/* ---------- Design tokens (ίδια με το Figma design system) ---------- */
 :root{
-  --ink:#1B2F3F; --steel:#3E5C76; --bg:#F2F4F6; --card:#FFFFFF; --line:#D5DBE1;
-  --accent:#E8730C; --accent-dark:#B85A06; --ok:#1E7B4F; --err:#B3261E;
-  --r-s:8px; --r-m:12px; --tap:48px;
+  --green:#1F3A2E; --green-deep:#14281F; --beige:#EFE6D4; --beige-light:#F7F1E5;
+  --oak:#A67C52; --oak-dark:#5C3F2B; --gold:#C9A24B; --gold-press:#B38D38;
+  --err:#B3261E; --ok:#2F7D4F; --r-s:8px; --r-m:12px; --tap:48px;
   --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0}
-html,body{height:100%}
-body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;display:flex;justify-content:center}
-#app{width:100%;max-width:480px;min-height:100%;background:var(--bg);display:flex;flex-direction:column;position:relative}
-header{background:var(--ink);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1000}
-header h1{font-size:18px;font-weight:600;flex:1}
-.back{background:none;border:0;color:#fff;font-size:24px;min-width:var(--tap);height:var(--tap);margin:-8px 0 -8px -12px;cursor:pointer;display:none}
+body{font-family:var(--font);background:var(--green-deep);color:var(--green);font-size:16px;line-height:1.5;display:flex;justify-content:center}
+#app{width:100%;max-width:480px;min-height:100vh;background:var(--beige);position:relative}
+header{background:var(--green);color:var(--beige-light);height:56px;padding:0 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:1000}
+header h1{font-size:18px;font-weight:500}
+.back{display:none;background:none;border:0;color:var(--beige-light);font-size:26px;width:var(--tap);height:var(--tap);margin-left:-12px;cursor:pointer}
 .back.on{display:block}
-main{flex:1;padding:16px 16px 96px}
+main{padding:16px 16px 96px}
 .screen{display:none}.screen.on{display:block}
-h2{font-size:22px;line-height:1.25;margin-bottom:8px}
-p.lead{color:var(--steel);margin-bottom:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:16px;margin-bottom:12px}
-.hero{background:var(--ink);color:#fff;border-radius:var(--r-m);padding:20px;margin-bottom:16px;border-left:8px solid var(--accent)}
-.hero p{color:#C9D6E0;margin-bottom:16px}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);padding:0 20px;border-radius:var(--r-s);border:2px solid transparent;font:600 16px var(--font);cursor:pointer;width:100%;text-decoration:none}
-.btn-primary{background:var(--accent);color:#1B1206}
-.btn-primary:active{background:var(--accent-dark);color:#fff}
-.btn-secondary{background:#fff;border-color:var(--steel);color:var(--ink)}
-.btn+.btn{margin-top:10px}
+h2{font-size:24px;line-height:1.25;font-weight:700;margin-bottom:8px}
+h3{font-size:18px;font-weight:600}
+.sub{color:var(--oak-dark);font-size:15px;margin-bottom:16px}
+.tagline{color:var(--oak-dark);font-size:14px;margin-bottom:12px}
+.hero{background:var(--green);color:var(--beige-light);border-radius:var(--r-m);padding:20px;margin-bottom:20px}
+.hero h2{color:var(--beige-light)}
+.hero p{margin-bottom:16px;color:#E2D9C4}
+.btn{display:flex;align-items:center;justify-content:center;min-height:var(--tap);width:100%;padding:0 20px;border-radius:var(--r-s);border:2px solid transparent;font:600 16px var(--font);cursor:pointer}
+.btn-gold{background:var(--gold);color:var(--green)}
+.btn-gold:active{background:var(--gold-press)}
+.btn-outline{background:var(--beige-light);border-color:var(--oak);color:var(--green)}
+.btn-outline:active{background:var(--beige)}
+.link{background:none;border:0;display:block;margin:8px auto 0;min-height:var(--tap);font:500 16px var(--font);color:var(--oak-dark);cursor:pointer}
 :focus-visible{outline:3px solid #1A6FD6;outline-offset:2px}
-.svc{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:16px;margin-bottom:12px;font:inherit;color:inherit;cursor:pointer}
-.svc h3{font-size:18px;margin-bottom:4px}
-.svc p{color:var(--steel);font-size:15px}
-.svc .more{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.svc.open .more{display:block}
-.svc ul{padding-left:20px;margin:6px 0 12px;font-size:15px}
-.tag{display:inline-block;font-size:13px;font-weight:600;background:#E4ECF2;color:var(--steel);border-radius:999px;padding:2px 10px;margin-bottom:8px}
-label,legend{display:block;font-weight:600;margin-bottom:6px}
-.field{margin-bottom:18px}
-input[type=text],input[type=tel],input[type=email],select,textarea{width:100%;min-height:var(--tap);padding:10px 12px;border:2px solid var(--line);border-radius:var(--r-s);font:16px var(--font);background:#fff;color:var(--ink)}
-textarea{min-height:110px;resize:vertical}
-.err-msg{display:none;color:var(--err);font-size:14px;margin-top:4px}
-.invalid input,.invalid select,.invalid textarea{border-color:var(--err)}
-.invalid .err-msg{display:block}
+.card{background:var(--beige-light);border:1px solid #D9C7A8;border-radius:var(--r-m);padding:14px 16px;margin-bottom:12px}
+.card small{display:block;color:var(--oak-dark);font-size:14px}
+.acc{padding:0;overflow:hidden}
+.acc-h{width:100%;min-height:56px;background:none;border:0;padding:0 16px;display:flex;align-items:center;justify-content:space-between;font:600 18px var(--font);color:var(--green);cursor:pointer;text-align:left}
+.acc-h i{font-style:normal;transition:transform .2s}
+.acc.open .acc-h i{transform:rotate(180deg)}
+.acc-b{display:none;padding:0 16px 16px}
+.acc.open .acc-b{display:block}
+.acc-b p{color:var(--oak-dark);margin-bottom:8px}
+.acc-b ul{padding-left:20px;font-size:15px;margin-bottom:16px;color:var(--oak-dark)}
+label,legend{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.field{margin-bottom:16px}
+input,select,textarea{width:100%;min-height:var(--tap);padding:10px 14px;border:2px solid #CDB894;border-radius:var(--r-s);background:var(--beige-light);font:16px var(--font);color:var(--green)}
+textarea{min-height:104px;resize:vertical}
+::placeholder{color:#7A6650;opacity:1}
 fieldset{border:0;padding:0}
-.prio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.prio input{position:absolute;opacity:0}
-.prio label{margin:0;min-height:var(--tap);display:flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:var(--r-s);background:#fff;font-weight:500;cursor:pointer;text-align:center;font-size:15px}
-.prio input:checked+label{border-color:var(--accent);background:#FFF1E4;font-weight:700}
-.prio input:focus-visible+label{outline:3px solid #1A6FD6}
-.hint{font-size:14px;color:var(--steel);margin-bottom:12px}
-.chosen{display:none;background:#E4ECF2;border-radius:var(--r-s);padding:10px 12px;margin-bottom:16px;font-size:15px}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chips input{position:absolute;opacity:0}
+.chips label{margin:0;min-height:var(--tap);display:flex;align-items:center;justify-content:center;border:2px solid var(--oak);border-radius:var(--r-s);background:var(--beige-light);font-weight:500;cursor:pointer}
+.chips input:checked+label{background:var(--green);border-color:var(--green);color:var(--beige-light);font-weight:600}
+.chips input:focus-visible+label{outline:3px solid #1A6FD6;outline-offset:2px}
+.msg{display:none;color:var(--err);font-size:14px;margin-top:4px}
+.bad input,.bad select,.bad textarea{border-color:var(--err)}
+.bad .msg{display:block}
+.banner{display:none;border:2px solid var(--err);color:var(--err);border-radius:var(--r-s);padding:10px 14px;margin-bottom:16px;font-size:15px;background:#FBEDEA}
+.banner.on{display:block}
+.chosen{display:none;background:var(--beige-light);border-left:4px solid var(--gold);padding:8px 12px;margin-bottom:16px;font-size:15px}
 .chosen.on{display:block}
-#map{height:340px;border-radius:var(--r-m);border:1px solid var(--line);margin-bottom:12px}
+#map{height:300px;border-radius:var(--r-m);border:1px solid #D9C7A8;margin-bottom:12px}
 .leaflet-popup-content{font:15px/1.4 var(--font);margin:12px}
-.leaflet-popup-content .btn{margin-top:8px;min-height:44px;font-size:15px}
-.ok-box{text-align:center;padding:24px 16px}
-.ok-box .tick{width:64px;height:64px;border-radius:50%;background:var(--ok);color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-dl.sum{text-align:left;margin:16px 0;font-size:15px}
-dl.sum dt{font-weight:600;color:var(--steel);margin-top:8px}
-nav{position:fixed;bottom:0;width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:1000}
-nav button{background:none;border:0;min-height:64px;font:500 13px var(--font);color:var(--steel);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-top:4px solid transparent}
-nav button span{font-size:22px;line-height:1}
-nav button.on{color:var(--ink);font-weight:700;border-top-color:var(--accent)}
-@media (prefers-reduced-motion:no-preference){.ok-box .tick{animation:pop .3s ease-out}@keyframes pop{from{transform:scale(.5)}to{transform:scale(1)}}}
+.pin{background:none;border:0}
+.leaflet-container{font-family:var(--font)}
+.det h3{margin-bottom:4px}.det p{font-size:15px;color:var(--oak-dark)}
+.det .btn{margin-top:12px}
+.done{text-align:center;padding-top:8px}
+.tick{width:64px;height:64px;border-radius:50%;background:var(--ok);color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;margin:8px auto 16px}
+.code{text-align:left;margin:16px 0}
+.code strong{display:block;font-size:22px}
+.attr{font-size:14px;color:var(--oak-dark);margin-top:8px}
+nav{position:fixed;bottom:0;width:100%;max-width:480px;background:var(--green);display:grid;grid-template-columns:repeat(4,1fr);z-index:1000}
+nav button{background:none;border:0;border-top:4px solid transparent;min-height:68px;color:#D9CFB8;font:500 13px var(--font);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+nav button b{font-size:22px;font-weight:400;line-height:1}
+nav button.on{color:var(--gold);border-top-color:var(--gold);font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app">
-<header><button class="back" id="back" aria-label="Επιστροφή στην προηγούμενη οθόνη">←</button><h1 id="title">TechServ</h1></header>
+<header><button class="back" id="back" aria-label="Επιστροφή στην προηγούμενη οθόνη">‹</button><h1 id="title">TechServ</h1></header>
 <main>
 
-<!-- Οθόνη 1: Αρχική -->
 <section class="screen on" id="home">
+  <p class="tagline">Σταθερή λειτουργία, κάθε μέρα.</p>
   <div class="hero">
     <h2>Βλάβη στη γραμμή παραγωγής;</h2>
-    <p>Βρείτε την κατάλληλη υπηρεσία συντήρησης και στείλτε αίτημα τεχνικής υποστήριξης σε λίγα βήματα.</p>
-    <button class="btn btn-primary" data-go="request">Αίτημα Υποστήριξης</button>
+    <p>Η τεχνική μας ομάδα είναι εδώ για να σας βοηθήσει.</p>
+    <button class="btn btn-gold" data-go="request">Αίτημα Υποστήριξης</button>
   </div>
-  <h2>Τι προσφέρουμε</h2>
-  <p class="lead">Υπηρεσίες για τεχνικούς, μηχανικούς και υπευθύνους συντήρησης βιομηχανικών εγκαταστάσεων.</p>
-  <div class="card"><strong>Προληπτική συντήρηση</strong><br>Προγραμματισμένοι έλεγχοι που μειώνουν τις απρογραμμάτιστες στάσεις.</div>
-  <div class="card"><strong>Επισκευές</strong><br>Αποκατάσταση βλαβών σε μηχανήματα και συστήματα αυτοματισμού.</div>
-  <div class="card"><strong>Τεχνική διάγνωση</strong><br>Εντοπισμός της αιτίας προβλήματος με μετρήσεις και δοκιμές.</div>
-  <button class="btn btn-secondary" data-go="services">Δείτε όλες τις υπηρεσίες</button>
-  <button class="btn btn-secondary" data-go="map">Βρείτε σημείο εξυπηρέτησης</button>
+  <h2 style="font-size:20px">Οι υπηρεσίες μας</h2>
+  <div class="card"><h3>Προληπτική συντήρηση</h3><small>Πρόληψη αντί για διακοπές.</small></div>
+  <div class="card"><h3>Επισκευές</h3><small>Φροντίδα για κάθε βλάβη.</small></div>
+  <div class="card"><h3>Τεχνική διάγνωση</h3><small>Απαντήσεις με ακρίβεια.</small></div>
+  <button class="btn btn-outline" data-go="services">Δείτε όλες τις υπηρεσίες</button>
+  <button class="link" data-go="map">Βρείτε σημείο εξυπηρέτησης →</button>
 </section>
 
-<!-- Οθόνη 2: Υπηρεσίες -->
 <section class="screen" id="services">
-  <h2>Υπηρεσίες Συντήρησης</h2>
-  <p class="lead">Επιλέξτε μια κατηγορία για να δείτε την περιγραφή της.</p>
+  <h2>Φροντίδα σε κάθε στάδιο</h2>
+  <p class="sub">Επιλέξτε την υπηρεσία που χρειάζεται ο εξοπλισμός σας.</p>
   <div id="svcList"></div>
+  <div class="card" style="margin-top:4px"><h3>Δεν είστε σίγουροι;</h3>
+    <p class="sub" style="margin:4px 0 12px">Περιγράψτε το πρόβλημα και θα σας κατευθύνουμε.</p>
+    <button class="btn btn-outline" data-go="request">Περιγράψτε το πρόβλημα</button></div>
 </section>
 
-<!-- Οθόνη 3: Αίτημα -->
 <section class="screen" id="request">
   <div id="formWrap">
-    <h2>Αίτημα Υποστήριξης</h2>
-    <p class="hint">Τα πεδία με * είναι υποχρεωτικά.</p>
+    <h2 id="formTitle">Πώς μπορούμε να βοηθήσουμε;</h2>
+    <p class="sub" id="formSub">Συμπληρώστε τα στοιχεία του αιτήματος. Όλα τα πεδία είναι υποχρεωτικά.</p>
     <div class="chosen" id="chosen"></div>
+    <div class="banner" id="banner" role="alert">Ελέγξτε τα πεδία που επισημαίνονται.</div>
     <form id="form" novalidate>
-      <div class="field" data-f="equip"><label for="equip">Τύπος εξοπλισμού *</label>
-        <select id="equip"><option value="">Επιλέξτε…</option><option>CNC / Εργαλειομηχανή</option><option>Αντλία / Συμπιεστής</option><option>Ταινιόδρομος / Γραμμή παραγωγής</option><option>Ηλεκτροκινητήρας / Ηλεκτρικός πίνακας</option><option>Ρομποτικό σύστημα</option><option>Άλλο</option></select>
-        <div class="err-msg">Επιλέξτε τον τύπο του εξοπλισμού.</div></div>
-      <div class="field" data-f="desc"><label for="desc">Περιγραφή προβλήματος *</label>
-        <textarea id="desc" placeholder="π.χ. Ο κινητήρας σταματά μετά από 10 λεπτά λειτουργίας και ακούγεται θόρυβος."></textarea>
-        <div class="err-msg">Περιγράψτε το πρόβλημα με τουλάχιστον 10 χαρακτήρες.</div></div>
-      <div class="field" data-f="prio"><fieldset><legend>Προτεραιότητα *</legend>
-        <div class="prio">
+      <div class="field" data-f="equip"><label for="equip">Τύπος εξοπλισμού</label>
+        <select id="equip"><option value="">Επιλέξτε εξοπλισμό</option><option>Αντλία / Κινητήρας</option><option>Γραμμή παραγωγής</option><option>Άλλος εξοπλισμός</option></select>
+        <div class="msg">Επιλέξτε τύπο εξοπλισμού.</div></div>
+      <div class="field" data-f="desc"><label for="desc">Περιγραφή προβλήματος</label>
+        <textarea id="desc" placeholder="Περιγράψτε τι συμβαίνει…"></textarea>
+        <div class="msg">Προσθέστε μια σύντομη περιγραφή (τουλάχιστον 10 χαρακτήρες).</div></div>
+      <div class="field" data-f="prio"><fieldset><legend>Προτεραιότητα</legend>
+        <div class="chips">
           <input type="radio" name="prio" id="p1" value="Χαμηλή"><label for="p1">Χαμηλή</label>
-          <input type="radio" name="prio" id="p2" value="Μεσαία"><label for="p2">Μεσαία</label>
+          <input type="radio" name="prio" id="p2" value="Μεσαία" checked><label for="p2">Μεσαία</label>
           <input type="radio" name="prio" id="p3" value="Επείγον"><label for="p3">Επείγον</label>
-        </div></fieldset>
-        <div class="err-msg">Επιλέξτε προτεραιότητα.</div></div>
-      <div class="field" data-f="name"><label for="name">Ονοματεπώνυμο *</label>
-        <input type="text" id="name" autocomplete="name"><div class="err-msg">Συμπληρώστε το ονοματεπώνυμό σας.</div></div>
-      <div class="field" data-f="phone"><label for="phone">Τηλέφωνο *</label>
-        <input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="69XXXXXXXX"><div class="err-msg">Εισάγετε έγκυρο τηλέφωνο (10 ψηφία).</div></div>
+        </div></fieldset></div>
+      <div class="field" data-f="name"><label for="name">Ονοματεπώνυμο</label>
+        <input id="name" type="text" autocomplete="name" placeholder="π.χ. Γιώργος Παπαδόπουλος">
+        <div class="msg">Συμπληρώστε το ονοματεπώνυμό σας.</div></div>
+      <div class="field" data-f="phone"><label for="phone">Τηλέφωνο</label>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="π.χ. 690 000 0000">
+        <div class="msg">Εισάγετε τηλέφωνο με 10 ψηφία.</div></div>
       <div class="field" data-f="email"><label for="email">Email</label>
-        <input type="email" id="email" autocomplete="email"><div class="err-msg">Το email δεν είναι έγκυρο.</div></div>
-      <button class="btn btn-primary" type="submit">Υποβολή αιτήματος</button>
+        <input id="email" type="email" autocomplete="email" placeholder="π.χ. g.papadopoulos@example.com">
+        <div class="msg">Εισάγετε έγκυρο email, π.χ. onoma@example.com.</div></div>
+      <button class="btn btn-gold" type="submit">Υποβολή αιτήματος</button>
     </form>
   </div>
-  <div class="card ok-box" id="okBox" style="display:none">
+  <div class="done" id="done" style="display:none">
     <div class="tick" aria-hidden="true">✓</div>
-    <h2>Το αίτημα υποβλήθηκε</h2>
-    <p class="lead">Κωδικός αιτήματος: <strong id="ticket"></strong><br>(Προσομοίωση – δεν στάλθηκε πουθενά.)</p>
-    <dl class="sum" id="sum"></dl>
-    <button class="btn btn-primary" id="newReq">Νέο αίτημα</button>
-    <button class="btn btn-secondary" data-go="home">Αρχική</button>
+    <h2 style="font-size:22px">Το αίτημα υποβλήθηκε</h2>
+    <p class="sub">Ευχαριστούμε. Η ομάδα μας θα επικοινωνήσει μαζί σας για τα επόμενα βήματα.</p>
+    <div class="card code"><small>Κωδικός αιτήματος</small><strong id="ticket"></strong><span id="sumLine" style="font-size:15px"></span><br><span style="font-size:15px">Κατάσταση: Παραλήφθηκε</span></div>
+    <p class="sub">Κρατήστε τον κωδικό για κάθε επικοινωνία σχετική με το αίτημά σας.</p>
+    <button class="btn btn-gold" id="toHome">Επιστροφή στην αρχική</button>
+    <p class="attr">Προσομοίωση: το αίτημα δεν αποστέλλεται ούτε αποθηκεύεται.</p>
   </div>
 </section>
 
-<!-- Οθόνη 4: Χάρτης -->
 <section class="screen" id="map-screen">
-  <h2>Σημεία Τεχνικής Εξυπηρέτησης</h2>
-  <p class="lead">Πατήστε έναν marker για πληροφορίες.</p>
-  <div id="map" aria-label="Διαδραστικός χάρτης"></div>
+  <h2>Βρείτε την ομάδα σας</h2>
+  <p class="sub">Αθήνα · Ασπρόπυργος · Ελευσίνα. Πατήστε έναν marker.</p>
+  <div id="map" aria-label="Χάρτης σημείων τεχνικής εξυπηρέτησης"></div>
+  <div class="card det" id="det"><p>Επιλέξτε έναν marker για να δείτε τα στοιχεία του σημείου.</p></div>
+  <p class="attr">© OpenStreetMap contributors</p>
 </section>
-
 </main>
+
 <nav aria-label="Κύρια πλοήγηση">
-  <button data-go="home" class="on"><span>⌂</span>Αρχική</button>
-  <button data-go="services"><span>⚙</span>Υπηρεσίες</button>
-  <button data-go="request"><span>✎</span>Αίτημα</button>
-  <button data-go="map"><span>⌖</span>Χάρτης</button>
+  <button data-go="home" class="on"><b>⌂</b>Αρχική</button>
+  <button data-go="services"><b>⚒</b>Υπηρεσίες</button>
+  <button data-go="request"><b>▤</b>Αίτημα</button>
+  <button data-go="map"><b>⌖</b>Χάρτης</button>
 </nav>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const SERVICES=[
- {id:'prev',name:'Προληπτική συντήρηση',short:'Προγραμματισμένοι έλεγχοι και service για αποφυγή βλαβών.',
-  items:['Λίπανση και ρύθμιση','Έλεγχος φθοράς εξαρτημάτων','Θερμογραφία ηλεκτρικών πινάκων','Αναφορά κατάστασης εξοπλισμού'],note:'Συνιστάται κάθε 3–6 μήνες, ανάλογα με τις ώρες λειτουργίας.'},
- {id:'repair',name:'Επισκευές',short:'Αποκατάσταση βλαβών σε μηχανήματα και αυτοματισμούς.',
-  items:['Αντικατάσταση εξαρτημάτων','Επισκευή κινητήρων και μειωτήρων','Επισκευή PLC και αισθητήρων','Επαναφορά σε λειτουργία'],note:'Για επείγουσες βλάβες επιλέξτε προτεραιότητα «Επείγον» στο αίτημα.'},
- {id:'diag',name:'Τεχνική διάγνωση',short:'Εντοπισμός της αιτίας ενός προβλήματος με μετρήσεις.',
-  items:['Μέτρηση κραδασμών','Ανάλυση ηλεκτρικών παραμέτρων','Έλεγχος κωδικών σφάλματος','Τεχνική έκθεση με προτάσεις'],note:'Κατάλληλη όταν η αιτία της βλάβης δεν είναι γνωστή.'}
+ {n:'Προληπτική συντήρηση',d:'Προγραμματισμένη φροντίδα για σταθερή, ασφαλή λειτουργία.',l:['Περιοδικοί έλεγχοι και λίπανση','Αντικατάσταση αναλώσιμων','Αναφορά κατάστασης εξοπλισμού']},
+ {n:'Επισκευές',d:'Γρήγορη αποκατάσταση βλαβών σε μηχανήματα και αυτοματισμούς.',l:['Αντικατάσταση εξαρτημάτων','Επισκευή κινητήρων και αντλιών','Επαναφορά σε λειτουργία']},
+ {n:'Τεχνική διάγνωση',d:'Εντοπισμός της αιτίας ενός προβλήματος με μετρήσεις και δοκιμές.',l:['Μέτρηση κραδασμών και θερμοκρασίας','Έλεγχος κωδικών σφάλματος','Τεχνική έκθεση με προτάσεις']}
 ];
 const POINTS=[
- {n:'Κέντρο Εξυπηρέτησης Ελευσίνας',lat:38.0407,lng:23.5420,a:'Βιομηχανική Περιοχή Ελευσίνας',h:'Δευ–Παρ 07:30–17:00',t:'210 000 0001',s:'Επισκευές, Διάγνωση'},
- {n:'Τεχνικό Σημείο Ασπροπύργου',lat:38.0600,lng:23.5900,a:'Βιομηχανική Ζώνη Ασπροπύργου',h:'Δευ–Σαβ 08:00–18:00',t:'210 000 0002',s:'Προληπτική συντήρηση, Επισκευές'},
- {n:'Σημείο Εξυπηρέτησης Πειραιά',lat:37.9440,lng:23.6400,a:'Περιοχή Λιμένα Πειραιά',h:'Δευ–Παρ 08:00–16:00',t:'210 000 0003',s:'Τεχνική διάγνωση'}
+ {n:'TechServ · Ελευσίνα',lat:38.0407,lng:23.5420,a:'Ιερά Οδός 12, Ελευσίνα',h:'Δευ–Παρ · 08:00–18:00',t:'210 000 0001'},
+ {n:'TechServ · Ασπρόπυργος',lat:38.0600,lng:23.5900,a:'Λεωφ. ΝΑΤΟ 24, Ασπρόπυργος',h:'Δευ–Παρ · 08:00–18:00',t:'210 000 0002'},
+ {n:'TechServ · Αθήνα',lat:37.9838,lng:23.7275,a:'Λεωφ. Αθηνών 100, Αθήνα',h:'Δευ–Παρ · 08:00–18:00',t:'210 000 0003'}
 ];
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const titles={home:'TechServ',services:'Υπηρεσίες Συντήρησης',request:'Αίτημα Υποστήριξης',map:'Χάρτης'};
-const idOf=k=>k==='map'?'map-screen':k;
-let stack=['home'], map, chosenCtx={};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const T={home:'TechServ',services:'Υπηρεσίες Συντήρησης',request:'Αίτημα Υποστήριξης',map:'Διαδραστικός Χάρτης'};
+let stack=['home'],ctx={},map,markers=[];
 
 function show(k,push=true){
   $$('.screen').forEach(s=>s.classList.remove('on'));
-  $('#'+idOf(k)).classList.add('on');
+  $('#'+(k==='map'?'map-screen':k)).classList.add('on');
   $$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===k));
-  $('#title').textContent=titles[k];
+  $('#title').textContent=T[k];
   if(push&&stack[stack.length-1]!==k)stack.push(k);
   $('#back').classList.toggle('on',stack.length>1);
   if(k==='map')initMap();
-  if(k==='request')renderChosen();
+  if(k==='request')renderCtx();
   window.scrollTo(0,0);
 }
-function back(){ if(stack.length>1){stack.pop();show(stack[stack.length-1],false);} }
+$('#back').onclick=()=>{if(stack.length>1){stack.pop();show(stack[stack.length-1],false)}};
 document.addEventListener('click',e=>{
-  const g=e.target.closest('[data-go]'); if(g){ if(g.dataset.go==='request'&&g.closest('.hero,.card,nav,.ok-box')===null){} show(g.dataset.go); }
-});
-$('#back').onclick=back;
-
-/* Υπηρεσίες */
-$('#svcList').innerHTML=SERVICES.map(s=>`<div class="svc" data-id="${s.id}" role="button" tabindex="0" aria-expanded="false">
- <h3>${s.name}</h3><p>${s.short}</p>
- <div class="more"><ul>${s.items.map(i=>`<li>${i}</li>`).join('')}</ul><p>${s.note}</p>
- <button class="btn btn-primary" data-req="${s.name}" style="margin-top:12px">Αίτημα για αυτή την υπηρεσία</button></div></div>`).join('');
-$$('.svc').forEach(c=>{
-  const t=()=>{c.classList.toggle('open');c.setAttribute('aria-expanded',c.classList.contains('open'))};
-  c.addEventListener('click',e=>{ if(e.target.closest('[data-req]'))return; t(); });
-  c.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target===c){e.preventDefault();t();} });
-});
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-req]'); if(!b)return;
-  chosenCtx={service:b.dataset.req}; show('request');
+  const g=e.target.closest('[data-go]');if(g){
+    if(g.closest('nav'))stack=['home'];
+    show(g.dataset.go);return}
+  const r=e.target.closest('[data-req]');if(r){ctx={service:r.dataset.req};show('request');return}
+  const p=e.target.closest('[data-pt]');if(p){ctx={point:POINTS[+p.dataset.pt].n};show('request')}
 });
 
-/* Χάρτης (Leaflet + OpenStreetMap) */
+$('#svcList').innerHTML=SERVICES.map((s,i)=>`<div class="card acc${i===0?' open':''}">
+ <button class="acc-h" aria-expanded="${i===0}">${s.n}<i aria-hidden="true">⌄</i></button>
+ <div class="acc-b"><p>${s.d}</p><ul>${s.l.map(x=>`<li>${x}</li>`).join('')}</ul>
+ <button class="btn btn-outline" data-req="${s.n}">Αίτημα για αυτή την υπηρεσία</button></div></div>`).join('');
+$$('.acc-h').forEach(h=>h.onclick=()=>{const a=h.parentElement;a.classList.toggle('open');h.setAttribute('aria-expanded',a.classList.contains('open'))});
+
+function pin(sel){const f=sel?'#14281F':'#C9A24B',c=sel?'#C9A24B':'#14281F';
+ return L.divIcon({className:'pin',iconSize:[44,52],iconAnchor:[22,50],popupAnchor:[0,-46],
+ html:`<svg width="44" height="52" viewBox="0 0 44 52"><path d="M22 50C22 50 6 32 6 20a16 16 0 0 1 32 0c0 12-16 30-16 30z" fill="${sel?c:f}" stroke="#14281F" stroke-width="3"/><circle cx="22" cy="20" r="6" fill="${sel?f:c}"/></svg>`})}
+function select(i){
+  markers.forEach((m,j)=>m.setIcon(pin(j===i)));
+  const p=POINTS[i];
+  $('#det').innerHTML=`<h3>${p.n}</h3><p>${p.a}<br>${p.h}<br>${p.t}</p><p class="attr">Ενδεικτικό σημείο και στοιχεία</p><button class="btn btn-gold" data-pt="${i}">Αίτημα σε αυτό το σημείο</button>`;
+}
 function initMap(){
   if(!map){
-    map=L.map('map').setView([38.0, 23.6],10);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
-    POINTS.forEach((p,i)=>{
-      L.marker([p.lat,p.lng],{title:p.n}).addTo(map).bindPopup(
-       `<strong>${p.n}</strong><br>${p.a}<br>Ώρες: ${p.h}<br>Τηλ: ${p.t}<br>Υπηρεσίες: ${p.s}
-        <button class="btn btn-primary" data-pt="${i}">Αίτημα σε αυτό το σημείο</button>`);
-    });
+    map=L.map('map').setView([38.02,23.62],10);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+    markers=POINTS.map((p,i)=>L.marker([p.lat,p.lng],{icon:pin(false),title:p.n,keyboard:true}).addTo(map)
+      .bindPopup(`<strong>${p.n}</strong><br>${p.a}<br>${p.h}`).on('click',()=>select(i)));
   }
-  setTimeout(()=>map.invalidateSize(),50);
+  setTimeout(()=>map.invalidateSize(),60);
 }
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-pt]'); if(!b)return;
-  chosenCtx={point:POINTS[+b.dataset.pt].n}; show('request');
-});
-function renderChosen(){
-  const c=$('#chosen'), parts=[];
-  if(chosenCtx.service)parts.push('Υπηρεσία: <strong>'+chosenCtx.service+'</strong>');
-  if(chosenCtx.point)parts.push('Σημείο: <strong>'+chosenCtx.point+'</strong>');
-  c.innerHTML=parts.join('<br>'); c.classList.toggle('on',parts.length>0);
+function renderCtx(){
+  const c=$('#chosen'),a=[];
+  if(ctx.service)a.push('Υπηρεσία: <strong>'+ctx.service+'</strong>');
+  if(ctx.point)a.push('Σημείο: <strong>'+ctx.point+'</strong>');
+  c.innerHTML=a.join('<br>');c.classList.toggle('on',a.length>0);
 }
 
-/* Φόρμα: έλεγχος πεδίων και προσομοίωση υποβολής */
-const rules={
+const V={
  equip:()=>$('#equip').value!=='',
  desc:()=>$('#desc').value.trim().length>=10,
- prio:()=>!!document.querySelector('input[name=prio]:checked'),
  name:()=>$('#name').value.trim().length>=3,
- phone:()=>/^\d{10}$/.test($('#phone').value.replace(/[\s\-+]/g,'').replace(/^30/,'')),
- email:()=>!$('#email').value.trim()||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('#email').value)
+ phone:()=>/^(\+?30)?\d{10}$/.test($('#phone').value.replace(/[\s-]/g,'')),
+ email:()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('#email').value.trim())
 };
-function check(k){const ok=rules[k]();document.querySelector(`[data-f=${k}]`).classList.toggle('invalid',!ok);return ok;}
-Object.keys(rules).forEach(k=>{
-  document.querySelector(`[data-f=${k}]`).addEventListener('change',()=>check(k));
-  document.querySelector(`[data-f=${k}]`).addEventListener('focusout',()=>check(k));
-});
+function check(k,quiet){const ok=V[k]();if(!quiet)document.querySelector(`[data-f=${k}]`).classList.toggle('bad',!ok);return ok}
+function ready(){const all=Object.keys(V).every(k=>check(k,true));
+  $('#formTitle').textContent=all?'Έτοιμο για υποβολή':'Πώς μπορούμε να βοηθήσουμε;';
+  $('#formSub').textContent=all?'Ελέγξτε τα στοιχεία σας πριν την υποβολή.':'Συμπληρώστε τα στοιχεία του αιτήματος. Όλα τα πεδία είναι υποχρεωτικά.';
+  if(all)$('#banner').classList.remove('on')}
+Object.keys(V).forEach(k=>{const f=document.querySelector(`[data-f=${k}]`);
+  f.addEventListener('focusout',()=>{check(k);ready()});f.addEventListener('input',()=>{if(f.classList.contains('bad'))check(k);ready()});f.addEventListener('change',()=>{check(k);ready()})});
 $('#form').addEventListener('submit',e=>{
   e.preventDefault();
-  const bad=Object.keys(rules).filter(k=>!check(k));
-  if(bad.length){const el=document.querySelector(`[data-f=${bad[0]}]`);el.scrollIntoView({block:'center'});(el.querySelector('input,select,textarea')||{focus(){}}).focus();return;}
-  const g=id=>$('#'+id).value.trim();
+  const bad=Object.keys(V).filter(k=>!check(k));
+  $('#banner').classList.toggle('on',bad.length>0);
+  if(bad.length){const f=document.querySelector(`[data-f=${bad[0]}]`);f.scrollIntoView({block:'center'});f.querySelector('input,select,textarea').focus();return}
   $('#ticket').textContent='REQ-'+Math.floor(1000+Math.random()*9000);
-  const rows=[['Εξοπλισμός',g('equip')],['Προτεραιότητα',document.querySelector('input[name=prio]:checked').value],['Επικοινωνία',g('name')+' – '+g('phone')]];
-  if(chosenCtx.service)rows.unshift(['Υπηρεσία',chosenCtx.service]);
-  if(chosenCtx.point)rows.unshift(['Σημείο εξυπηρέτησης',chosenCtx.point]);
-  $('#sum').innerHTML=rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('');
-  $('#formWrap').style.display='none';$('#okBox').style.display='block';window.scrollTo(0,0);
+  const extra=ctx.service?ctx.service:(ctx.point||'');
+  $('#sumLine').textContent=[ $('#equip').value, extra ].filter(Boolean).join(' · ');
+  $('#formWrap').style.display='none';$('#done').style.display='block';
+  $('#title').textContent='Επιβεβαίωση';window.scrollTo(0,0);
 });
-$('#newReq').onclick=()=>{$('#form').reset();$$('.invalid').forEach(x=>x.classList.remove('invalid'));chosenCtx={};renderChosen();$('#okBox').style.display='none';$('#formWrap').style.display='block';};
+$('#toHome').onclick=()=>{
+  $('#form').reset();$('#p2').checked=true;$$('.bad').forEach(x=>x.classList.remove('bad'));ctx={};ready();
+  $('#done').style.display='none';$('#formWrap').style.display='block';stack=['home'];show('home',false)};
 </script>
 </body>
 </html>
